@@ -12,6 +12,7 @@ applications_dir="$data_home/applications"
 desktop_file="$applications_dir/$app_id.desktop"
 icons_dir="$data_home/icons/hicolor"
 
+# Print the supported command and environment overrides.
 usage() {
   cat <<'EOF'
 Usage: scripts/install-linux-desktop.sh [--uninstall]
@@ -30,6 +31,7 @@ if [[ "$(uname -s)" != "Linux" ]]; then
   exit 1
 fi
 
+# Ask installed desktop tools to notice launcher and icon changes immediately.
 refresh_desktop_caches() {
   if command -v update-desktop-database >/dev/null 2>&1; then
     update-desktop-database "$applications_dir" >/dev/null 2>&1 || true
@@ -39,6 +41,7 @@ refresh_desktop_caches() {
   fi
 }
 
+# Remove only the files managed by this user-scoped installer.
 uninstall() {
   rm -f -- \
     "$installed_binary" \
@@ -82,10 +85,10 @@ fi
 # a quoted argument. Escape them so paths such as a home directory with spaces
 # remain a single executable name in freedesktop launchers.
 desktop_exec="$(printf '%s' "$installed_binary" | sed \
-  -e 's/\\/\\\\/g' \
+  -e 's/\\/\\\\\\\\/g' \
   -e 's/"/\\"/g' \
   -e 's/`/\\`/g' \
-  -e 's/\$/\\$/g' \
+  -e 's/\$/\\\\$/g' \
   -e 's/%/%%/g')"
 desktop_try_exec="$(printf '%s' "$installed_binary" | sed -e 's/\\/\\\\/g')"
 
