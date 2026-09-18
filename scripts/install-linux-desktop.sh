@@ -93,7 +93,8 @@ desktop_exec="$(printf '%s' "$installed_binary" | sed \
 desktop_try_exec="$(printf '%s' "$installed_binary" | sed -e 's/\\/\\\\/g')"
 
 desktop_tmp="$(mktemp --suffix=.desktop)"
-trap 'rm -f -- "$desktop_tmp"' EXIT
+binary_tmp="$bin_dir/.monocode.install.$$"
+trap 'rm -f -- "$desktop_tmp" "$binary_tmp"' EXIT
 cat >"$desktop_tmp" <<EOF
 [Desktop Entry]
 Type=Application
@@ -116,7 +117,8 @@ if command -v desktop-file-validate >/dev/null 2>&1; then
 fi
 
 mkdir -p -- "$bin_dir" "$applications_dir"
-install -m 755 -- "$source_binary" "$installed_binary"
+install -m 755 -- "$source_binary" "$binary_tmp"
+mv -f -- "$binary_tmp" "$installed_binary"
 
 for size in 32 128 256; do
   icon_dir="$icons_dir/${size}x${size}/apps"
